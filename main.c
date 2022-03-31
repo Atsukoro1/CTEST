@@ -11,7 +11,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <math.h>
 
 #define __NEWLINE__ "\r\r\n"
 #define __SEPARATOR__ "------------------------"
@@ -107,14 +106,12 @@ void captured_packet(u_char *useless, const struct pcap_pkthdr* hdr, const u_cha
 void capture(char* device) {
     char* errbuf[PCAP_ERRBUF_SIZE];
 
-    printf("%s", device);
-    
     /*
         Will create a packet capture handle
         Returns NULL if handle can't be created, in this case
         we'll print out the error buffer and exit the program with 1 status code
     */
-    pcap_t* created = pcap_create(device, *errbuf);
+    pcap_t* created = pcap_create("wlp1s0", *errbuf);
 
     if(created == NULL) {
         printf("%s%s", *errbuf, __NEWLINE__);
@@ -135,7 +132,7 @@ void capture(char* device) {
     */
     printf("Interface activated!%s", __NEWLINE__);
 
-    pcap_loop(created, INFINITY, captured_packet, NULL);
+    pcap_loop(created, 419829675, captured_packet, NULL);
 
     pcap_close(created);
 }
