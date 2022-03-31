@@ -16,13 +16,14 @@ sudo apt-get install -y libpcap-dev
 
 # Arch
 # At Arch, devel is included in normal libpcap
+sudo pacman -Syu
 sudo pacman -S libpcap
 ```
 
 2. Compile program using GCC
 ```bash
 # Ubuntu version
-gcc main.c -o output -L/usr/include -lpcap && ./output
+gcc main.c -o output -L/usr/include -lpcap && sudo ./output
 ```
 
 ## Contributing

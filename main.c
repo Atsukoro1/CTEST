@@ -49,8 +49,27 @@ char* get_interface_flags(bpf_u_int32* decimal_flags) {
 }
 
 /*
-    Let user select the network interface that will capture packets
+    Print available information about network interface
+    This recursive function can be called again
+    if there is more than one interface present
 */
+void print_interface(pcap_if_t* device) {
+    // Device parameters
+    bpf_u_int32* flags = &device->flags;
+    pcap_addr_t* addr = device->addresses;
+    char* device_name = device->name;
+    char* flags_string = get_interface_flags(flags);  
+
+    printf("%s: FLAGS(%lu)<%s>%s", device_name, strlen(flags_string), flags_string, __NEWLINE__);    
+    printf("%s%s", __SEPARATOR__, __NEWLINE__);
+
+    // Check if there is another device to print, if so call the recursive function again
+    if(device[0].next != NULL) print_interface(device->next);
+    
+    free(flags_string);
+}
+
+// Let user select the network interface that will capture packets
 char* get_selected_interface() {
     char* selected_interface = (char*)malloc(sizeof(char) * 20);
     char* device_name;
@@ -58,40 +77,16 @@ char* get_selected_interface() {
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_if_t* alldevs;
 
-    /*
-        Get all available network interfaces
-        returns PCAP_ERROR on failure or 0 on success
-    */
+    // Get all available network interfaces, returns PCAP_ERROR on failure or 0 on success
     int devices_succefully_returned = pcap_findalldevs(&alldevs, errbuf);
 
-    /*
-        If there was an error while fetching interfaces, return empty char
-    */
+    // If there was an error while fetching interfaces, return empty char
     if(devices_succefully_returned == PCAP_ERROR) {
         printf("%s", errbuf);
         return '\0';
     }
 
-    /*
-        Loop through all of the network interfaces
-        and print all available information
-    */
-    for (size_t i = 0; i < 1; i++)
-    {
-        bpf_u_int32* flags = &alldevs[i].flags;
-        pcap_addr_t* addr = alldevs[i].addresses;
-
-        /*
-            Name of the device that we'll pass to open the connection
-        */
-        char* device_name = alldevs[i].name;
-        char* flags_string = get_interface_flags(flags);
-        printf("%s: FLAGS (%s)%s", device_name, flags_string, __NEWLINE__);      
-        free(flags_string); 
-
-
-        printf("%s%s", __SEPARATOR__, __NEWLINE__);
-    }
+    print_interface(alldevs);
 
     printf("Name of the network interface to use: ");
     fgets(selected_interface, 20, stdin);
@@ -100,7 +95,7 @@ char* get_selected_interface() {
 }
 
 void captured_packet(u_char *useless, const struct pcap_pkthdr* hdr, const u_char*packet) {
-    printf("%s", packet);
+    printf("CCCC");
 }
 
 void capture(char* device) {
@@ -111,7 +106,7 @@ void capture(char* device) {
         Returns NULL if handle can't be created, in this case
         we'll print out the error buffer and exit the program with 1 status code
     */
-    pcap_t* created = pcap_create("wlp1s0", *errbuf);
+    pcap_t* created = pcap_create("eth0", *errbuf);
 
     if(created == NULL) {
         printf("%s%s", *errbuf, __NEWLINE__);
@@ -132,9 +127,30 @@ void capture(char* device) {
     */
     printf("Interface activated!%s", __NEWLINE__);
 
-    pcap_loop(created, 419829675, captured_packet, NULL);
+    int loop_status = pcap_loop(created, 419829675, captured_packet, NULL);
 
+    switch (loop_status) 
+    {
+    case PCAP_ERROR_BREAK:
+        printf("Loop was finished beacause of breakloop that was called.");
+        break;
+    
+    case PCAP_ERROR_NOT_ACTIVATED:
+        printf("Device wasn't activated before it started capturing.");
+        break;
+
+    case 0:
+        printf("Loop was terminated due to exhaustion of count");
+        break;
+
+    default:
+        printf("Some error happened while trying to loop through packets -> %s", pcap_geterr(created));
+        break;
+    }
+
+    // Program was successfully closed, exit..
     pcap_close(created);
+    exit(0);
 }
 
 int main(int argc, char **argv) {
