@@ -1,9 +1,8 @@
 /* 
-    Run this tool as ROOT (without root it may show less interfaces)!
-    Please ensure that all required libraries are installed,
+    Please ensure that all required libraries are installed 
     to make sure everything will run correctly.
 
-    Compile and run it using GCC
+    Compile and run it using GCC ->
     gcc main.c -o output -L/usr/include -lpcap && ./output
 */
 #include <stdio.h>
@@ -56,12 +55,19 @@ char* get_interface_flags(bpf_u_int32* decimal_flags) {
 void print_interface(pcap_if_t* device) {
     // Device parameters
     bpf_u_int32* flags = &device->flags;
-    pcap_addr_t* addr = device->addresses;
     char* device_name = device->name;
-    char* flags_string = get_interface_flags(flags);  
+    char* device_desc = device->description;
+    char* flags_string = get_interface_flags(flags);
 
-    printf("%s: FLAGS(%lu)<%s>%s", device_name, strlen(flags_string), flags_string, __NEWLINE__);    
-    printf("%s%s", __SEPARATOR__, __NEWLINE__);
+    // Device addresses  
+    pcap_addr_t* addr = device->addresses;
+
+    // We'll print devices with only 1 flag or more to avoid interfaces that aren't up
+    if(strlen(flags_string) != 0) {
+        fprintf(stdout, "%s: FLAGS(%lu)<%s>%s", device_name, strlen(flags_string), flags_string, __NEWLINE__);    
+        fprintf(stdout, "%s%s", device_desc, __NEWLINE__);
+        fprintf(stdout, "%s%s", __SEPARATOR__, __NEWLINE__);
+    }
 
     // Check if there is another device to print, if so call the recursive function again
     if(device[0].next != NULL) print_interface(device->next);
@@ -88,14 +94,14 @@ char* get_selected_interface() {
 
     print_interface(alldevs);
 
-    printf("Name of the network interface to use: ");
+    fprintf(stdout, "Name of the network interface to use: ");
     fgets(selected_interface, 20, stdin);
 
     return selected_interface;
 }
 
-void captured_packet(u_char *useless, const struct pcap_pkthdr* hdr, const u_char*packet) {
-    printf("CCCC");
+void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
+    fprintf(stdout, "log");
 }
 
 void capture(char* device) {
@@ -109,14 +115,14 @@ void capture(char* device) {
     pcap_t* created = pcap_create("eth0", *errbuf);
 
     if(created == NULL) {
-        printf("%s%s", *errbuf, __NEWLINE__);
+        fprintf(stderr, "%s%s", *errbuf, __NEWLINE__);
         return exit(EXIT_FAILURE);
     };
 
     int activation_status = pcap_activate(created);
 
     if(activation_status == PCAP_ERROR || activation_status != 0) {
-        printf("%s", pcap_geterr(created));
+        fprintf(stderr, "%s", pcap_geterr(created));
         exit(EXIT_FAILURE);
     }
 
@@ -125,27 +131,27 @@ void capture(char* device) {
         capture_packet will handle incoming packets.
         We'll capture infinite amount of packets unless user provides a count
     */
-    printf("Interface activated!%s", __NEWLINE__);
+    fprintf(stdout, "Interface activated!%s", __NEWLINE__);
 
-    int loop_status = pcap_loop(created, 419829675, captured_packet, NULL);
+    int loop_status = pcap_loop(created, -1, captured_packet, NULL);
 
     switch (loop_status) 
     {
-    case PCAP_ERROR_BREAK:
-        printf("Loop was finished beacause of breakloop that was called.");
-        break;
+        case PCAP_ERROR_BREAK:
+            fprintf(stderr, "Loop was finished beacause of breakloop that was called.");
+            break;
     
-    case PCAP_ERROR_NOT_ACTIVATED:
-        printf("Device wasn't activated before it started capturing.");
-        break;
+        case PCAP_ERROR_NOT_ACTIVATED:
+            fprintf(stderr, "Device wasn't activated before it started capturing.");
+            break;
 
-    case 0:
-        printf("Loop was terminated due to exhaustion of count");
-        break;
+        case 0:
+            fprintf(stderr, "Loop was terminated due to exhaustion of count");
+            break;
 
-    default:
-        printf("Some error happened while trying to loop through packets -> %s", pcap_geterr(created));
-        break;
+        default:
+            fprintf(stderr, "Some error happened while trying to loop through packets -> %s", pcap_geterr(created));
+            break;
     }
 
     // Program was successfully closed, exit..
@@ -155,7 +161,7 @@ void capture(char* device) {
 
 int main(int argc, char **argv) {
     if(getuid() != 0) {
-        printf("Please make sure to run this tool as root!%s", __NEWLINE__);
+        fprintf(stderr, "Please make sure to run this tool as root!%s", __NEWLINE__);
         return 1;
     }
 
