@@ -101,7 +101,7 @@ char* get_selected_interface() {
 }
 
 void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
-    fprintf(stdout, "log");
+    fprintf(stdout, "%s", pkt);
 }
 
 void capture(char* device) {
@@ -112,12 +112,22 @@ void capture(char* device) {
         Returns NULL if handle can't be created, in this case
         we'll print out the error buffer and exit the program with 1 status code
     */
-    pcap_t* created = pcap_create("eth0", *errbuf);
+    pcap_t* created = pcap_create("wlp1s0", *errbuf);
+
+    /*
+        Set timeout to deliver packets in right time after we receive them
+        Can throw an error if device is already activated.
+    */
+    int timeout_success = pcap_set_timeout(created, 1);
+
+    if(timeout_success == PCAP_ERROR_ACTIVATED) {
+        fprintf(stdin, "The device you're trying to set timeout on is already activated and can't be modified");
+    }
 
     if(created == NULL) {
         fprintf(stderr, "%s%s", *errbuf, __NEWLINE__);
         return exit(EXIT_FAILURE);
-    };
+    }
 
     int activation_status = pcap_activate(created);
 
