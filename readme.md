@@ -1,6 +1,6 @@
 # Netscrape
 
-Netscape is CLI that sniffs for incoming packets on specific wireless interface
+Netscape is command line tool that sniffs for incoming packets on specific wireless interface
 and prints them in Human Readable format. Netscrape will not work on Windows because
 LibPCap library only works on GNU/Linux. Also this is my first tool made with C so it may contain some memory leaks and other problems.
 
