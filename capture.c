@@ -7,11 +7,13 @@ void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *
 void setup_capture(char* device) {
     char* errbuf[PCAP_ERRBUF_SIZE];
 
-    pcap_t* created = pcap_create("any", *errbuf);
+    pcap_t* created = pcap_create(device, *errbuf);
 
-    int timeout_success = pcap_set_timeout(created, 0);
+    int timeout_success = pcap_set_immediate_mode(created, 0);
 
     int buf_size_success = pcap_set_buffer_size(created, 10);
+
+    pcap_set_promisc(created, 1);
 
     if(timeout_success == PCAP_ERROR_ACTIVATED || buf_size_success == PCAP_ERROR_ACTIVATED) {
         fprintf(stdin, "The device you're trying to set timeout or buffer size on is already activated and can't be modified");

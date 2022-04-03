@@ -40,7 +40,7 @@ char* get_interface_flags(bpf_u_int32* decimal_flags) {
 void print_interface(pcap_if_t* device) {
     bpf_u_int32* flags = &device->flags;
     char* device_name = device->name;
-    char* device_desc = device->description;
+    char* device_desc = device->description == NULL ? "No description provided" : device->description;
     char* flags_string = get_interface_flags(flags);
 
     pcap_addr_t* addr = device->addresses;

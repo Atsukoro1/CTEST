@@ -2,12 +2,13 @@
     Please ensure that all required libraries are installed 
     to make sure everything will run correctly.
 
-    Compile and run it using GCC ->
+    Compile and run it using GCC or premade Makefile ->
     gcc main.c interfaces.c -o output -L/usr/include -lpcap && ./output
+    or
+    make
 */
 #include <stdio.h>
 #include <pcap.h>
-#include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 
