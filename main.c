@@ -3,7 +3,7 @@
     to make sure everything will run correctly.
 
     Compile and run it using GCC or premade Makefile ->
-    gcc main.c interfaces.c -o output -L/usr/include -lpcap && ./output
+    gcc main.c interfaces.c capture.c -o output -L/usr/include -lpcap && sudo ./output
     or
     make
 */
