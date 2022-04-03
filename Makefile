@@ -10,4 +10,4 @@ compile_tool:
 	gcc ./build/capture.o ./build/interfaces.o ./build/main.o -L/usr/include -lpcap -o netscrape
 
 run:
-	chmod +x ./netscrape && clear && sudo ./netscrape 
+	mv ./netscrape ./build/ && chmod +x ./build/netscrape && sudo ./build/netscrape 

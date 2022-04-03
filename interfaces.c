@@ -1,21 +1,29 @@
 #include "interfaces.h"
 
 char* get_interface_flags(bpf_u_int32* decimal_flags) {
-    char* flag_string = (char*)malloc(sizeof(char) * 30);
+    char* flag_string = (char*)malloc(sizeof(char) * 130);
     strcpy(flag_string, "\0");
 
-    const int flag_names[4] = {
+    const int flag_names[8] = {
         PCAP_IF_LOOPBACK, 
         PCAP_IF_UP, 
         PCAP_IF_RUNNING, 
-        PCAP_IF_WIRELESS
+        PCAP_IF_WIRELESS,
+        PCAP_IF_CONNECTION_STATUS_UNKNOWN,
+        PCAP_IF_CONNECTION_STATUS_CONNECTED,
+        PCAP_IF_CONNECTION_STATUS_DISCONNECTED,
+        PCAP_IF_CONNECTION_STATUS_NOT_APPLICABLE
     };
 
-    const char* flag_values[4] = {
+    const char* flag_values[8] = {
         "LOOPBACK",
         "UP",
         "RUNNING",
-        "WIRELESS"
+        "WIRELESS",
+        "UNKNOWN",
+        "CONNECTED",
+        "DISCONNECTED",
+        "NOT_APPLICABLE"
     };
 
     for (size_t i = 0; i < (sizeof(flag_names) / sizeof(flag_names[0])); i++)

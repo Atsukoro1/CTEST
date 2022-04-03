@@ -23,11 +23,9 @@ sudo pacman -S libpcap
 2. Compile program using GCC
 ```bash
 gcc main.c -o output -L/usr/include -lpcap && sudo ./output
-```
 
 or simply
 
-```bash
 make
 ```
 
