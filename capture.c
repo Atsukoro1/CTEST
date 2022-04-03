@@ -1,4 +1,5 @@
 #include "capture.h"
+#include "interfaces.h"
 
 void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
     fprintf(stdout, "%s", pkt);
@@ -31,7 +32,7 @@ void setup_capture(char* device) {
         exit(EXIT_FAILURE);
     }
 
-    fprintf(stdout, "Interface activated!%s", __NEWLINE__);
+    fprintf(stdout, "%sYou are now listening to %s (%s)!%s", __NEWLINE__, device, get_datalink(created), __NEWLINE__);
 
     int loop_status = pcap_loop(created, -1, captured_packet, NULL);
 

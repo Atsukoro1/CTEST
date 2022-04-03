@@ -2,6 +2,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netinet/ip.h> 
 
 #ifndef INTERFACES_H
 #define INTERFACES_H
@@ -27,5 +30,11 @@ void print_interface(pcap_if_t* device);
     Selected interface should be string, not position in list!!
 */
 char* get_selected_interface();
+
+/*
+    Will convert decimal data-link header value to human-readable 
+    string that will contain linklayer type
+*/
+char* get_datalink(pcap_t* device);
 
 #endif
