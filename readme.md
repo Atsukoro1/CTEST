@@ -4,9 +4,9 @@ Netscape is command line tool that sniffs for incoming packets on specific wirel
 and prints them in Human Readable format. Netscrape will not work on Windows because
 LibPCap library only works on GNU/Linux. Also this is my first tool made with C so it may contain some memory leaks and other problems.
 
-## Installation
+## Compiling and running
 
-Use GNU-C-Compiler [GCC](https://gcc.gnu.org/) to compile the main.c file
+Use GNU-C-Compiler [GCC](https://gcc.gnu.org/) or the makefile in root directory to compile Netscrape.
 
 1. Make sure all libraries are installed
 ```bash
@@ -22,8 +22,13 @@ sudo pacman -S libpcap
 
 2. Compile program using GCC
 ```bash
-# Ubuntu version
 gcc main.c -o output -L/usr/include -lpcap && sudo ./output
+```
+
+or simply
+
+```bash
+make
 ```
 
 ## Contributing
