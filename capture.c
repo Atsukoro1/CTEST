@@ -1,8 +1,13 @@
+#include <time.h>
 #include "capture.h"
 #include "interfaces.h"
 
 void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
-    fprintf(stdout, "%s", pkt);
+    time_t cas = hdr->ts.tv_sec;
+    struct tm *ptm = localtime(&cas);
+
+    // Header info - time, length in plaintext and bytes
+    fprintf(stdout, "%s%02d:%02d:%02d [%d bytes, %d length]", __NEWLINE__, ptm->tm_hour, ptm->tm_min, ptm->tm_sec, hdr->caplen, hdr->len);
 }
 
 void setup_capture(char* device) {
