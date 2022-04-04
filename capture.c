@@ -15,7 +15,7 @@ void setup_capture(char* device) {
 
     pcap_t* created = pcap_create(device, *errbuf);
 
-    int timeout_success = pcap_set_immediate_mode(created, 0);
+    int timeout_success = pcap_set_timeout(created, 100);
 
     int buf_size_success = pcap_set_buffer_size(created, 10);
 
