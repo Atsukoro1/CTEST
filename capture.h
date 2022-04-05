@@ -5,6 +5,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/ip.h> 
+#include <net/ethernet.h>
+#include <netinet/ether.h>
+#include <time.h>
 
 #ifndef CAPTURE_H
 #define CAPTURE_H

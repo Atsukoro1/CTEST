@@ -1,4 +1,3 @@
-#include <time.h>
 #include "capture.h"
 #include "interfaces.h"
 
@@ -6,8 +5,29 @@ void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *
     time_t cas = hdr->ts.tv_sec;
     struct tm *ptm = localtime(&cas);
 
+    struct ether_header* eptr;
+    eptr = (struct ether_header *)pkt;
+
+    switch(ntohs(eptr->ether_type)) {
+        case ETHERTYPE_ARP:
+            fprintf(stdout, "(ARP) ");
+            break;
+        
+        case ETHERTYPE_IP:
+            fprintf(stdout, "(IP) ");
+            break;
+
+        case ETHERTYPE_IPV6:
+            fprintf(stdout, "(IPV6) ");
+            break;
+
+        case ETHERTYPE_REVARP:
+            fprintf(stdout, "(REVARP) ");
+            break;
+    }
+
     // Header info - time, length in plaintext and bytes
-    fprintf(stdout, "%s%02d:%02d:%02d [%d bytes, %d length]", __NEWLINE__, ptm->tm_hour, ptm->tm_min, ptm->tm_sec, hdr->caplen, hdr->len);
+    fprintf(stdout, "%02d:%02d:%02d [%d bytes, %d length]%s", ptm->tm_hour, ptm->tm_min, ptm->tm_sec, hdr->caplen, hdr->len, __NEWLINE__);
 }
 
 void setup_capture(char* device) {
