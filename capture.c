@@ -5,29 +5,60 @@ void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *
     time_t cas = hdr->ts.tv_sec;
     struct tm *ptm = localtime(&cas);
 
+    // Print protocol
     struct ether_header* eptr;
     eptr = (struct ether_header *)pkt;
+    char* text_prot;
 
     switch(ntohs(eptr->ether_type)) {
         case ETHERTYPE_ARP:
-            fprintf(stdout, "(ARP) ");
+            text_prot = "ARP";
             break;
         
         case ETHERTYPE_IP:
-            fprintf(stdout, "(IP) ");
+            text_prot = "IP";
             break;
 
         case ETHERTYPE_IPV6:
-            fprintf(stdout, "(IPV6) ");
+            text_prot = "IPV6";
             break;
 
         case ETHERTYPE_REVARP:
-            fprintf(stdout, "(REVARP) ");
+            text_prot = "RARP";
+            break;
+
+        case ETHERTYPE_LOOPBACK:
+            text_prot = "LOOPBACK";
+            break;
+
+        case ETHERTYPE_VLAN:
+            text_prot = "VLAN";
+            break;
+
+        case ETHERTYPE_AARP:
+            text_prot = "AARP";
+            break;
+
+        case ETHERTYPE_NTRAILER:
+            text_prot = "NTRAILER";
             break;
     }
 
-    // Header info - time, length in plaintext and bytes
-    fprintf(stdout, "%02d:%02d:%02d [%d bytes, %d length]%s", ptm->tm_hour, ptm->tm_min, ptm->tm_sec, hdr->caplen, hdr->len, __NEWLINE__);
+    // Source and destination MAC addresses
+    struct ether_header* eth_head;
+    eth_head = (struct ether_header*)pkt;
+    char* src = ether_ntoa((struct ether_addr*)eth_head->ether_shost);
+    char* dest = ether_ntoa((struct ether_addr*)eth_head->ether_dhost);
+
+    fprintf(stdout, "[%02d:%02d:%02d] %s | len %d, size %d %s -> %s%s", ptm->tm_hour, ptm->tm_min, ptm->tm_sec, text_prot, hdr->len, hdr->caplen, src, dest, __NEWLINE__);
+
+    for (size_t i = 0; i < hdr->len; i++)
+    {
+        fprintf(stdout, "%c", pkt[i]);
+    }
+
+    fprintf(stdout, "%s%s", __NEWLINE__, __NEWLINE__);
+    
 }
 
 void setup_capture(char* device) {
