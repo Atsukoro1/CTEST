@@ -9,6 +9,7 @@
 #include <netinet/ip.h>
 #include <netinet/ether.h>
 #include <time.h>
+#include <ctype.h>
 
 #ifndef ETHERNET_HN_H
 #define ETHERNET_HN_H

@@ -1,5 +1,30 @@
 #include "ethernet_hn.h"
 
+void print_data(const char* buffer, int size) {
+    fprintf(stdout, "%s" ,__NEWLINE__);
+    for(size_t i = 0; i != 10; i++) {
+        for (size_t a = 0; a < 10; a++) {
+            if(buffer[i * a] < 0) {
+                fprintf(stdout, " FF");
+            } else {
+                fprintf(stdout, " %02X", (unsigned int)buffer[i * a]);
+            }
+        }
+
+        fprintf(stdout, "%s", "         ");
+
+        for (size_t a = 0; a < 10; a++) {
+            if(buffer[i * a] > 33 && buffer[i * a] < 127) {
+                fprintf(stdout, " %c", (unsigned char)buffer[i * a]);
+            } else {
+                fprintf(stdout, " .");
+            }
+        }
+
+        fprintf(stdout, "%s", __NEWLINE__);
+    }
+}
+
 void print_ip_uint_to_string(unsigned int raw_ip, char* text) {
     unsigned char ip_addr[4];
     ip_addr[0] = raw_ip & 0xFF;
@@ -19,10 +44,10 @@ void print_ip(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
     fprintf(stdout, "   | TOS %d%s", iph->tos, __NEWLINE__);
     fprintf(stdout, "   | FRAG OFF %d%s", iph->frag_off, __NEWLINE__);
     fprintf(stdout, "   | CHECK %d%s", iph->check, __NEWLINE__);
-    fprintf(stdout, "   | ");
-    print_ip_uint_to_string(iph->saddr, "SRC");
-    fprintf(stdout, "   | ");
-    print_ip_uint_to_string(iph->daddr, "DEST");
+    print_ip_uint_to_string(iph->saddr, "   | SRC");
+    print_ip_uint_to_string(iph->daddr, "   | DEST");
+
+    print_data(pkt, hdr->len);
 };
 
 void print_arp(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
@@ -45,14 +70,18 @@ void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *
     fprintf(stdout, "%s[%02d:%02d:%02d] | len %d, size %d %s -> %s%s", __NEWLINE__, ptm->tm_hour, ptm->tm_min, ptm->tm_sec, hdr->len, hdr->caplen, src, dest, __NEWLINE__);
 
     switch(ntohs(eptr->ether_type)) {
-        case ETHERTYPE_ARP:
+        case 0x0806:
+            // ARP
             print_arp(args, hdr, pkt);
             break;
 
-        case ETHERTYPE_IP:
+        case 0x0800:
+            // IPV4
             print_ip(args, hdr, pkt);
             break;  
-        case ETHERTYPE_IPV6:
+        
+        case 0x86DD:
+            // IPV6
             print_ip(args, hdr, pkt);
             break;
     }
