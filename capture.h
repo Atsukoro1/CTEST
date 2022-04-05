@@ -8,7 +8,6 @@
 #include <net/ethernet.h>
 #include <netinet/ether.h>
 #include <time.h>
-#include <libnet.h>
 
 #ifndef CAPTURE_H
 #define CAPTURE_H

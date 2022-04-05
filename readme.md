@@ -14,7 +14,6 @@ Use GNU-C-Compiler [GCC](https://gcc.gnu.org/) or the makefile in root directory
 sudo apt-get update -y
 sudo apt-get install -y libpcap-dev
 
-# Arch
 # At Arch, devel is included in normal libpcap
 sudo pacman -Syu
 sudo pacman -S libpcap
