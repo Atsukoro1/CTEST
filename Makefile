@@ -4,10 +4,10 @@ create_folder:
 	mkdir -p ./build
 
 compile_dependencies:
-	gcc -c main.c capture.c interfaces.c && mv *.o ./build
+	gcc -c main.c capture.c interfaces.c ./packet_handlers/ethernet_hn.c && mv *.o ./build
 
 compile_tool:
-	gcc ./build/capture.o ./build/interfaces.o ./build/main.o -L/usr/include -lpcap -o netscrape
+	gcc ./build/capture.o ./build/interfaces.o ./build/ethernet_hn.o ./build/main.o -L/usr/include -lpcap -o netscrape
 
 run:
 	mv ./netscrape ./build/ && chmod +x ./build/netscrape && sudo ./build/netscrape 
