@@ -52,12 +52,9 @@ void print_ip(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
 
 void print_arp(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
     struct arphdr* arp_header = (struct arphdr*)pkt;
+    struct arpreq* arp_request = (struct arpreq*)pkt;
 
     fprintf(stdout, "   | Header %s%s", "ARP", __NEWLINE__);
-    fprintf(stdout, "   | Hardware addr format %d%s", arp_header->ar_hrd, __NEWLINE__);
-    fprintf(stdout, "   | Operation %d%s", arp_header->ar_op, __NEWLINE__);
-    fprintf(stdout, "   | Protocol addr length %d%s", arp_header->ar_pln, __NEWLINE__);
-    fprintf(stdout, "   | Protocol addr format %x%s", arp_header->ar_pro, __NEWLINE__);
     fprintf(stdout, "   | Hardware addr length %d%s", arp_header->ar_hln, __NEWLINE__);
 };
 
@@ -85,12 +82,12 @@ void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *
 
         case 0x0800:
             // IPV4
-            // print_ip(args, hdr, pkt);
+            print_ip(args, hdr, pkt);
             break;  
         
         case 0x86DD:
             // IPV6
-            // print_ip(args, hdr, pkt);
+            print_ip(args, hdr, pkt);
             break;
 
         case 0x01:
