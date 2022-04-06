@@ -2,7 +2,7 @@
 
 void print_data(const char* buffer, int size) {
     fprintf(stdout, "%s" ,__NEWLINE__);
-    for(size_t i = 0; i != 10; i++) {
+    for(size_t i = 0; i != size; i++) {
         for (size_t a = 0; a < 10; a++) {
             if(buffer[i * a] < 0) {
                 fprintf(stdout, " FF");
@@ -47,10 +47,18 @@ void print_ip(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
     print_ip_uint_to_string(iph->saddr, "   | SRC");
     print_ip_uint_to_string(iph->daddr, "   | DEST");
 
-    print_data(pkt, hdr->len);
+    print_data(pkt, 5);
 };
 
 void print_arp(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
+    struct arphdr* arp_header = (struct arphdr*)pkt;
+
+    fprintf(stdout, "   | Header %s%s", "ARP", __NEWLINE__);
+    fprintf(stdout, "   | Hardware addr format %d%s", arp_header->ar_hrd, __NEWLINE__);
+    fprintf(stdout, "   | Operation %d%s", arp_header->ar_op, __NEWLINE__);
+    fprintf(stdout, "   | Protocol addr length %d%s", arp_header->ar_pln, __NEWLINE__);
+    fprintf(stdout, "   | Protocol addr format %x%s", arp_header->ar_pro, __NEWLINE__);
+    fprintf(stdout, "   | Hardware addr length %d%s", arp_header->ar_hln, __NEWLINE__);
 };
 
 void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
@@ -77,12 +85,148 @@ void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *
 
         case 0x0800:
             // IPV4
-            print_ip(args, hdr, pkt);
+            // print_ip(args, hdr, pkt);
             break;  
         
         case 0x86DD:
             // IPV6
-            print_ip(args, hdr, pkt);
+            // print_ip(args, hdr, pkt);
+            break;
+
+        case 0x01:
+            // ICMP / Not implemented
+            break;
+
+        case 0x809B:
+            // Appletalk (Ethertalk) / Not implemented for now
+            break;
+
+        case 0x80F3:
+            // Appletalk Address Resolution protocol (AARP) / Not implemented for now
+            break;
+
+        case 0x8100:
+            // VLAN & IEEE 802.1Q / Not implemented for now
+            break;
+
+        case 0x8137:
+            // IPX / Not implemented for now
+            break;
+
+        case 0x8204:
+            // QNX Qnet / Not implemented for now
+            break;
+
+        case 0x8808:
+            // Ethernet flow control / Not implemented for now
+            break;
+
+        case 0x8819:
+            // CobraNet / Not implemented for now
+            break;
+
+        case 0x8847:
+            // MLPS Multicast / Not implemented for now
+            break;
+
+        case 0x8848:
+            // MLPS Multicast / Not implemented for now
+            break;
+
+        case 0x8863:
+            // PPPoE Discovery stage / Not implemented for now
+            break;
+
+        case 0x8870:
+            // Jumbo frames / Not implemented for now
+            break;
+
+        case 0x887B:
+            // HomePlug 1.0 MME / Not implemented for now
+            break;
+
+        case 0x888E:
+            // EAP over LAN (IEEE 802.1X) / Not implemented for now
+            break;
+
+        case 0x8892:
+            // PROFINET Protocol / Not implemented for now
+            break;
+
+        case 0x889A:
+            // HYPERSCSI (SCSI over Ethernet) / Not implemented for now
+            break;
+
+        case 0x99A2:
+            // ATA over Ethernet / Not implemented for now
+            break;
+
+        case 0x88A4:
+            // EtherCAT Protocol / Not implemented for now
+            break;
+
+        case 0x88A8:
+            // Provider Bridging (IEEE 802.1ad) & Shortest Path Bridging IEEE 802.1aq / Not implemented for now
+            break;
+
+        case 0x88AB:
+            // Ethernet Powerlink / Not implemented for now
+            break;
+
+        case 0x88CC:
+            // Link Layer Discovery Protocol / Not implemented for now
+            break;
+
+        case 0x88CD:
+            // SERCOS III / Not implemented for now
+            break;
+
+        case 0x88E1:
+            // Homeplug AV MME / Not implemented for now
+            break;
+
+        case 0x88E3:
+            // Media Redundancy Protocol (IEC62439-2) / Not implemented for now
+            break;
+
+        case 0x88E5:
+            // MAC Security (IEEE 802.1AE) / Not implemented for now
+            break;
+
+        case 0x88F7:
+            // Precision Time Protocol (PTP over Ethernet) (IEEE 1588) / Not implemented for now
+            break;
+
+        case 0x8902:
+            // IEEE 802.1ag Connectivity Fault Management (CFM) / Not implemented for now
+            break;
+
+        case 0x8906:
+            // Fibre Channel over Ethernet (FCoE) / Not implemented for now
+            break;
+
+        case 0x8914:
+            // FCoE Initialization Protocol / Not implemented for now
+            break;
+
+        case 0x8915:
+            // RDMA over Converged Ethernet / Not implemented for now
+            break;
+
+        case 0x892F:
+            // High-availability Seamless Redundancy (HSR) / Not implemented for now
+            break;
+
+        case 0x9000:
+            // Ethernet Configuration Testing Protocol / Not implemented for now
+            break;
+
+        case 0x9100:
+            // Q-in-Q / Not implemented for now
+            break;
+
+        case 0xCAFE:
+            // Veritas Low Latency Transport / Not implemented for now
             break;
     }
 }
