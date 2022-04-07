@@ -54,8 +54,42 @@ void print_arp(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
     struct arphdr* arp_header = (struct arphdr*)pkt;
     struct arpreq* arp_request = (struct arpreq*)pkt;
 
+    char* flags = (char*)calloc(80, sizeof(char));
+
+    char arp_flags_values[7] = {
+        ATF_COM,
+        ATF_PERM,
+        ATF_PUBL,
+        ATF_USETRAILERS,
+        ATF_NETMASK,
+        ATF_DONTPUB,
+        ATF_MAGIC
+    };
+
+    char* arp_flag_descs[7] = {
+        "Completed entry (ha valid)",
+        "Permanent entry",
+        "Publish entry",
+        "Has requested trailers",
+        "Want to use a netmask (only for proxy entries)",
+        "Don't answer this addresses",
+        "Automatically added entry"
+    };
+
+    for(size_t i = 0; i != (sizeof(arp_flags_values) / sizeof(arp_flags_values[0])); i++) {
+        if(arp_flags_values[i] & arp_request->arp_flags) {
+            flags = (char*)realloc(flags, sizeof(flags) + (sizeof(char) * 80));
+            strcat(flags, "     | ");
+            strcat(flags, arp_flag_descs[i]);
+            strcat(flags, "\r\r\n");
+        }
+    };
+
     fprintf(stdout, "   | Header %s%s", "ARP", __NEWLINE__);
+    fprintf(stdout, "   | FLAGS %s%s", flags, __NEWLINE__);
     fprintf(stdout, "   | Hardware addr length %d%s", arp_header->ar_hln, __NEWLINE__);
+
+    free(flags);
 };
 
 void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
@@ -82,12 +116,12 @@ void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *
 
         case 0x0800:
             // IPV4
-            print_ip(args, hdr, pkt);
+            // print_ip(args, hdr, pkt);
             break;  
         
         case 0x86DD:
             // IPV6
-            print_ip(args, hdr, pkt);
+            // print_ip(args, hdr, pkt);
             break;
 
         case 0x01:
