@@ -54,7 +54,7 @@ void print_arp(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
     struct arphdr* arp_header = (struct arphdr*)pkt;
     struct arpreq* arp_request = (struct arpreq*)pkt;
 
-    char* flags = (char*)calloc(80, sizeof(char));
+    char* flags = (char*)malloc(sizeof(char) * 300);
 
     char arp_flags_values[7] = {
         ATF_COM,
@@ -78,15 +78,13 @@ void print_arp(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
 
     for(size_t i = 0; i != (sizeof(arp_flags_values) / sizeof(arp_flags_values[0])); i++) {
         if(arp_flags_values[i] & arp_request->arp_flags) {
-            flags = (char*)realloc(flags, sizeof(flags) + (sizeof(char) * 80));
-            strcat(flags, "     | ");
+            strcat(flags, "\r\r\n     | ");
             strcat(flags, arp_flag_descs[i]);
-            strcat(flags, "\r\r\n");
         }
     };
 
     fprintf(stdout, "   | Header %s%s", "ARP", __NEWLINE__);
-    fprintf(stdout, "   | FLAGS %s%s", flags, __NEWLINE__);
+    fprintf(stdout, "   | FLAGS%s%s", flags, __NEWLINE__);
     fprintf(stdout, "   | Hardware addr length %d%s", arp_header->ar_hln, __NEWLINE__);
 
     free(flags);
