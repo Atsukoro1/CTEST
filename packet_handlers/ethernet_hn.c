@@ -1,5 +1,29 @@
 #include "ethernet_hn.h"
 
+char* sockaddr_to_string(const struct sockaddr* in, size_t max_len) {
+    char* result;
+
+    switch(in->sa_family) {
+        case AF_INET6:
+            inet_ntop(AF_INET6, &((struct sockaddr_in*)in)->sin_addr, result, max_len);
+            break;
+
+        case AF_INET:
+            inet_ntop(AF_INET, &((struct sockaddr_in*)in)->sin_addr, result, max_len);
+            break;
+
+        case ATF_NETMASK:
+            inet_ntop(ATF_NETMASK, &((struct sockaddr_in*)in)->sin_addr, result, max_len);
+            break;
+        
+        default:
+            result = "Can't resolve";
+            break;
+    }
+
+    return result;
+}
+
 void print_data(const char* buffer, int size) {
     fprintf(stdout, "%s" ,__NEWLINE__);
     for(size_t i = 0; i != size; i++) {
@@ -55,6 +79,7 @@ void print_arp(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
     struct arpreq* arp_request = (struct arpreq*)pkt;
 
     char* flags = (char*)malloc(sizeof(char) * 300);
+    strcpy(flags, "\0");
 
     char arp_flags_values[7] = {
         ATF_COM,
@@ -83,9 +108,12 @@ void print_arp(u_char *args, const struct pcap_pkthdr *hdr, const u_char *pkt) {
         }
     };
 
-    fprintf(stdout, "   | Header %s%s", "ARP", __NEWLINE__);
-    fprintf(stdout, "   | FLAGS%s%s", flags, __NEWLINE__);
-    fprintf(stdout, "   | Hardware addr length %d%s", arp_header->ar_hln, __NEWLINE__);
+    fprintf(stdout, "   | HEADER %s%s", "ARP", __NEWLINE__);
+    fprintf(stdout, "   | FLAGS%s%s", flags ? flags : "\r\r\n     | NO FLAGS AVAILABLE", __NEWLINE__);
+    fprintf(stdout, "   | HARDWARW ADDR LEN %d%s", arp_header->ar_hln, __NEWLINE__);
+    fprintf(stdout, "   | HARDWARE ADDR %s%s", sockaddr_to_string(&arp_request->arp_ha, 100), __NEWLINE__);
+    fprintf(stdout, "   | NETMASK %s%s", sockaddr_to_string(&arp_request->arp_netmask, 100), __NEWLINE__);
+    fprintf(stdout, "   | PROTOCOL ADDRESS %s%s", sockaddr_to_string(&arp_request->arp_pa, 100), __NEWLINE__);
 
     free(flags);
 };
@@ -124,6 +152,7 @@ void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *
 
         case 0x01:
             // ICMP / Not implemented
+            fprintf(stdout, "ICMP");
             break;
 
         case 0x809B:
@@ -136,6 +165,7 @@ void captured_packet(u_char *args, const struct pcap_pkthdr *hdr, const u_char *
 
         case 0x8100:
             // VLAN & IEEE 802.1Q / Not implemented for now
+            fprintf(stdout, "VLAN & IEEE");
             break;
 
         case 0x8137:
